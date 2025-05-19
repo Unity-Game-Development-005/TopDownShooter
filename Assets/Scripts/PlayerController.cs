@@ -1,19 +1,32 @@
 
 using UnityEngine;
 
+
 public class PlayerController : MonoBehaviour
 {
-    [SerializeField] private Transform upperBoundary;
+    [SerializeField] private float upperBoundary;
 
-    [SerializeField] private Transform lowerBoundary;
+    [SerializeField] private float lowerBoundary;
 
-    private float verticalInput1;
+    [SerializeField] private float rightBoundary;
 
-    private float verticalInput2;
+    [SerializeField] private float leftBoundary;
 
-    private float playerSpeed;
+    [SerializeField] private float playerSpeed;
+
+    private float playerVerticalInput;
+
+    private float playerHorizontalInput;
+
+    private Vector3 playerHorizontalDirection;
+
+    private Vector3 playerVerticalDirection;
+
+    private float flip;
 
     public int playerIndex;
+
+    public bool facingRight;
 
 
 
@@ -23,53 +36,114 @@ public class PlayerController : MonoBehaviour
         Initialise();
     }
 
+
     // Update is called once per frame
     void Update()
     {
-        verticalInput1 = Input.GetAxis("Vertical");
+        GetPlayerInput();
+    }
 
-        verticalInput2 = Input.GetAxis("Vertical1");
 
-        MovePlayer1();
+    private void GetPlayerInput()
+    {
+        playerVerticalInput = Input.GetAxis("Vertical" + playerIndex);
 
-        MovePlayer2();
+        playerHorizontalInput = Input.GetAxis("Horizontal" + playerIndex);
+
+        MovePlayer();
     }
 
 
     private void Initialise()
     {
-        playerSpeed = 6f;
+        flip = 180f;
+
+        // moves player along the 'z' axis
+        playerHorizontalDirection = Vector3.forward;
+
+        // moves player along the 'x' axis
+        playerVerticalDirection = Vector3.left;
+
+        facingRight = true;
     }
 
 
-    private void MovePlayer1()
+    private void MovePlayer()
     {
-        transform.Translate(playerSpeed * Time.deltaTime * verticalInput1 * Vector3.left);
+        // move the player up along the 'z' axis
+        transform.Translate(playerSpeed * Time.deltaTime * playerVerticalInput * playerVerticalDirection);
 
-        if (transform.position.z > upperBoundary.position.z)
+
+        // if the player's 'z' position is greater than the 'z' position of the upper boundary
+        if (transform.position.z > upperBoundary)
         {
-            transform.position = new Vector3(transform.position.x, transform.position.y, upperBoundary.position.z);
+            // then set the player to the upper boundaries 'z' position
+            transform.position = new Vector3(transform.position.x, transform.position.y, upperBoundary);
         }
 
-        if (transform.position.z < lowerBoundary.position.z)
+        // if the player's 'z' position is less than the 'z' position of the lower boundary
+        if (transform.position.z < lowerBoundary)
         {
-            transform.position = new Vector3(transform.position.x, transform.position.y, lowerBoundary.position.z);
+            // then set the player to the lower boundaries 'z' position
+            transform.position = new Vector3(transform.position.x, transform.position.y, lowerBoundary);
+        }
+
+
+        if (playerHorizontalInput > 0f)
+        {
+            FlipCharacterRight();
+
+            transform.Translate(playerSpeed * playerHorizontalInput * Time.deltaTime * playerHorizontalDirection);
+        }
+
+        if (playerHorizontalInput < 0f)
+        {
+            FlipCharacterLeft();
+
+            transform.Translate(playerSpeed * playerHorizontalInput * Time.deltaTime * playerHorizontalDirection);
+        }
+
+
+        if (transform.position.x > rightBoundary)
+        {
+            transform.position = new Vector3(rightBoundary, transform.position.y, transform.position.z);
+        }
+
+        if (transform.position.x < leftBoundary)
+        {
+            transform.position = new Vector3(leftBoundary, transform.position.y, transform.position.z);
         }
     }
 
 
-    private void MovePlayer2()
+    private void FlipCharacterLeft()
     {
-        transform.Translate(playerSpeed * Time.deltaTime * verticalInput1 * Vector3.left);
-
-        if (transform.position.z > upperBoundary.position.z)
+        // if the player is facing right
+        if (facingRight)
         {
-            transform.position = new Vector3(transform.position.x, transform.position.y, upperBoundary.position.z);
+            // flip the player 180
+            transform.Rotate(0f, flip, 0f);
+
+            playerHorizontalDirection = -playerHorizontalDirection;
+
+            playerVerticalDirection = -playerVerticalDirection;
+
+            facingRight = false;
         }
+    }
 
-        if (transform.position.z < lowerBoundary.position.z)
+
+    private void FlipCharacterRight()
+    {
+        if (!facingRight)
         {
-            transform.position = new Vector3(transform.position.x, transform.position.y, lowerBoundary.position.z);
+            transform.Rotate(0f, flip, 0f);
+
+            playerHorizontalDirection = -playerHorizontalDirection;
+
+            playerVerticalDirection = -playerVerticalDirection;
+
+            facingRight = true;
         }
     }
 
