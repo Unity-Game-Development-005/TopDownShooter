@@ -4,9 +4,7 @@ using UnityEngine;
 
 public class AnimalController : MonoBehaviour
 {
-    [SerializeField] private float upperBoundary;
-
-    [SerializeField] private float lowerBoundary;
+    public BoundsController boundsController;
 
     [SerializeField] private float animalSpeed;
 
@@ -44,12 +42,12 @@ public class AnimalController : MonoBehaviour
     {
         transform.Translate(animalSpeed * Time.deltaTime * animalDirection);
 
-        if (transform.position.z > upperBoundary)
+        if (transform.position.z > boundsController.upperBoundary.position.z)
         {
             transform.Rotate(0f, flip, 0f);
         }
 
-        if (transform.position.z < lowerBoundary)
+        if (transform.position.z < boundsController.lowerBoundary.position.z)
         {
             transform.Rotate(0f, flip, 0f);
         }

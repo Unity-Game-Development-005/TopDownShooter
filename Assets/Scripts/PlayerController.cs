@@ -4,13 +4,9 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    [SerializeField] private float upperBoundary;
+    public BoundsController boundsController;
 
-    [SerializeField] private float lowerBoundary;
-
-    [SerializeField] private float rightBoundary;
-
-    [SerializeField] private float leftBoundary;
+    public GameObject carrotPrefab;
 
     [SerializeField] private float playerSpeed;
 
@@ -50,6 +46,11 @@ public class PlayerController : MonoBehaviour
 
         playerHorizontalInput = Input.GetAxis("Horizontal" + playerIndex);
 
+        if (Input.GetKeyDown(KeyCode.X))
+        {
+            Instantiate(carrotPrefab, transform.position, carrotPrefab.transform.rotation);
+        }
+
         MovePlayer();
     }
 
@@ -75,17 +76,17 @@ public class PlayerController : MonoBehaviour
 
 
         // if the player's 'z' position is greater than the 'z' position of the upper boundary
-        if (transform.position.z > upperBoundary)
+        if (transform.position.z > boundsController.upperBoundary.position.z)
         {
             // then set the player to the upper boundaries 'z' position
-            transform.position = new Vector3(transform.position.x, transform.position.y, upperBoundary);
+            transform.position = new Vector3(transform.position.x, transform.position.y, boundsController.upperBoundary.position.z);
         }
 
         // if the player's 'z' position is less than the 'z' position of the lower boundary
-        if (transform.position.z < lowerBoundary)
+        if (transform.position.z < boundsController.lowerBoundary.position.z)
         {
             // then set the player to the lower boundaries 'z' position
-            transform.position = new Vector3(transform.position.x, transform.position.y, lowerBoundary);
+            transform.position = new Vector3(transform.position.x, transform.position.y, boundsController.lowerBoundary.position.z);
         }
 
 
@@ -104,14 +105,14 @@ public class PlayerController : MonoBehaviour
         }
 
 
-        if (transform.position.x > rightBoundary)
+        if (transform.position.x > boundsController.rightBoundary.position.x)
         {
-            transform.position = new Vector3(rightBoundary, transform.position.y, transform.position.z);
+            transform.position = new Vector3(boundsController.rightBoundary.position.x, transform.position.y, transform.position.z);
         }
 
-        if (transform.position.x < leftBoundary)
+        if (transform.position.x < boundsController.leftBoundary.position.x)
         {
-            transform.position = new Vector3(leftBoundary, transform.position.y, transform.position.z);
+            transform.position = new Vector3(boundsController.leftBoundary.position.x, transform.position.y, transform.position.z);
         }
     }
 
@@ -121,12 +122,7 @@ public class PlayerController : MonoBehaviour
         // if the player is facing right
         if (facingRight)
         {
-            // flip the player 180
-            transform.Rotate(0f, flip, 0f);
-
-            playerHorizontalDirection = -playerHorizontalDirection;
-
-            playerVerticalDirection = -playerVerticalDirection;
+            FlipPlayer();
 
             facingRight = false;
         }
@@ -137,14 +133,21 @@ public class PlayerController : MonoBehaviour
     {
         if (!facingRight)
         {
-            transform.Rotate(0f, flip, 0f);
-
-            playerHorizontalDirection = -playerHorizontalDirection;
-
-            playerVerticalDirection = -playerVerticalDirection;
+            FlipPlayer();
 
             facingRight = true;
         }
+    }
+
+
+    private void FlipPlayer()
+    {
+        // flip the player 180
+        transform.Rotate(0f, flip, 0f);
+
+        playerHorizontalDirection = -playerHorizontalDirection;
+
+        playerVerticalDirection = -playerVerticalDirection;
     }
 
 
