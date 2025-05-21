@@ -2,11 +2,13 @@
 using UnityEngine;
 
 
-public class PlayerController : MonoBehaviour
+public class Player2Controller : MonoBehaviour
 {
     public BoundsController boundsController;
 
-    public GameObject carrotPrefab;
+    public Transform ammoLauncher;
+
+    public GameObject ammoPrefab;
 
     [SerializeField] private float playerSpeed;
 
@@ -22,7 +24,7 @@ public class PlayerController : MonoBehaviour
 
     public int playerIndex;
 
-    public bool facingRight;
+    private bool facingRight;
 
 
 
@@ -46,9 +48,9 @@ public class PlayerController : MonoBehaviour
 
         playerHorizontalInput = Input.GetAxis("Horizontal" + playerIndex);
 
-        if (Input.GetKeyDown(KeyCode.X))
+        if (Input.GetKeyDown(KeyCode.RightControl))
         {
-            Instantiate(carrotPrefab, transform.position, carrotPrefab.transform.rotation);
+            Instantiate(ammoPrefab, ammoLauncher.position, transform.rotation);
         }
 
         MovePlayer();
@@ -75,21 +77,6 @@ public class PlayerController : MonoBehaviour
         transform.Translate(playerSpeed * Time.deltaTime * playerVerticalInput * playerVerticalDirection);
 
 
-        // if the player's 'z' position is greater than the 'z' position of the upper boundary
-        if (transform.position.z > boundsController.upperBoundary.position.z)
-        {
-            // then set the player to the upper boundaries 'z' position
-            transform.position = new Vector3(transform.position.x, transform.position.y, boundsController.upperBoundary.position.z);
-        }
-
-        // if the player's 'z' position is less than the 'z' position of the lower boundary
-        if (transform.position.z < boundsController.lowerBoundary.position.z)
-        {
-            // then set the player to the lower boundaries 'z' position
-            transform.position = new Vector3(transform.position.x, transform.position.y, boundsController.lowerBoundary.position.z);
-        }
-
-
         if (playerHorizontalInput > 0f)
         {
             FlipCharacterRight();
@@ -102,6 +89,21 @@ public class PlayerController : MonoBehaviour
             FlipCharacterLeft();
 
             transform.Translate(playerSpeed * playerHorizontalInput * Time.deltaTime * playerHorizontalDirection);
+        }
+
+
+        // if the player's 'z' position is greater than the 'z' position of the upper boundary
+        if (transform.position.z > boundsController.upperBoundary.position.z)
+        {
+            // then set the player to the upper boundaries 'z' position
+            transform.position = new Vector3(transform.position.x, transform.position.y, boundsController.upperBoundary.position.z);
+        }
+
+        // if the player's 'z' position is less than the 'z' position of the lower boundary
+        if (transform.position.z < boundsController.lowerBoundary.position.z)
+        {
+            // then set the player to the lower boundaries 'z' position
+            transform.position = new Vector3(transform.position.x, transform.position.y, boundsController.lowerBoundary.position.z);
         }
 
 
