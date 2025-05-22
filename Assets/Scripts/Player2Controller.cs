@@ -4,11 +4,17 @@ using UnityEngine;
 
 public class Player2Controller : MonoBehaviour
 {
-    public BoundsController boundsController;
+    public PlayerTwoHealth playerTwoHealthBar;
+
+    public PlayerTwoAmmo playerTwoAmmoBar;
+
+    //private BoundsController boundsController;
+
 
     public Transform ammoLauncher;
 
     public GameObject ammoPrefab;
+
 
     [SerializeField] private float playerSpeed;
 
@@ -20,11 +26,22 @@ public class Player2Controller : MonoBehaviour
 
     private Vector3 playerVerticalDirection;
 
+
     private float flip;
 
     public int playerIndex;
 
     private bool facingRight;
+
+
+    public int maximumHealth;
+
+    public int currentHealth;
+
+
+    public int maximumAmmo;
+
+    public int currentAmmo;
 
 
 
@@ -44,16 +61,35 @@ public class Player2Controller : MonoBehaviour
 
     private void GetPlayerInput()
     {
+        // get the player's movement inputs
         playerVerticalInput = Input.GetAxis("Vertical" + playerIndex);
 
         playerHorizontalInput = Input.GetAxis("Horizontal" + playerIndex);
 
-        if (Input.GetKeyDown(KeyCode.RightControl))
-        {
-            Instantiate(ammoPrefab, ammoLauncher.position, transform.rotation);
-        }
+        // see if player is firing
+        FireAmmo();
 
+        // move player
         MovePlayer();
+    }
+
+
+    // see if player is firing
+    private void FireAmmo()
+    {
+        // check that we still have some ammo
+        if (currentAmmo > 0)
+        {
+            // if we do, then check if the fire button has been pressed
+            if (Input.GetKeyDown(KeyCode.RightControl))
+            {
+                // if it has, then fire
+                Instantiate(ammoPrefab, ammoLauncher.position, transform.rotation);
+
+                // and subtract one from current ammo
+                ExpendAmmo();
+            }
+        }
     }
 
 
@@ -68,6 +104,53 @@ public class Player2Controller : MonoBehaviour
         playerVerticalDirection = Vector3.left;
 
         facingRight = true;
+
+
+        // player's maximum health
+        maximumHealth = 10;
+
+        // player's current health
+        currentHealth = maximumHealth;
+
+        // initialise the health bar
+        playerTwoHealthBar.SetMaximumHealth(maximumHealth);
+
+
+        // player's maximum ammo
+        maximumAmmo = 6;
+
+        // player's current ammo
+        currentAmmo = maximumAmmo;
+
+        // initialise the ammo bar
+        playerTwoAmmoBar.SetMaximumAmmo(maximumAmmo);
+    }
+
+
+    private void TakeDamage(int damage)
+    {
+        currentHealth -= damage;
+
+        // update the health bar slider
+        playerTwoHealthBar.SetHealthValue(currentHealth);
+    }
+
+
+    private void ExpendAmmo()
+    {
+        currentAmmo -= GameController.AMMO;
+
+        // update the ammo bar slider
+        playerTwoAmmoBar.SetAmmoValue(currentAmmo);
+    }
+
+
+    private void AddAmmo()
+    {
+        currentAmmo += GameController.AMMO;
+
+        // update the ammo bar slider
+        playerTwoAmmoBar.SetAmmoValue(currentAmmo);
     }
 
 
@@ -93,28 +176,30 @@ public class Player2Controller : MonoBehaviour
 
 
         // if the player's 'z' position is greater than the 'z' position of the upper boundary
-        if (transform.position.z > boundsController.upperBoundary.position.z)
+        if (transform.position.z > BoundsController.boundsController.upperBoundary.position.z) //.position.z)
         {
             // then set the player to the upper boundaries 'z' position
-            transform.position = new Vector3(transform.position.x, transform.position.y, boundsController.upperBoundary.position.z);
+            transform.position = new Vector3(transform.position.x, transform.position.y, BoundsController.boundsController.upperBoundary.position.z); //.position.z);
         }
 
         // if the player's 'z' position is less than the 'z' position of the lower boundary
-        if (transform.position.z < boundsController.lowerBoundary.position.z)
+        if (transform.position.z < BoundsController.boundsController.lowerBoundary.position.z) //.position.z)
         {
             // then set the player to the lower boundaries 'z' position
-            transform.position = new Vector3(transform.position.x, transform.position.y, boundsController.lowerBoundary.position.z);
+            transform.position = new Vector3(transform.position.x, transform.position.y, BoundsController.boundsController.lowerBoundary.position.z);  //.position.z);
         }
 
 
-        if (transform.position.x > boundsController.rightBoundary.position.x)
+        if (transform.position.x > BoundsController.boundsController.rightBoundary.position.x) //; .position.x)
         {
-            transform.position = new Vector3(boundsController.rightBoundary.position.x, transform.position.y, transform.position.z);
+            //transform.position = new Vector3(boundsController.rightBoundary.position.x, transform.position.y, transform.position.z);
+            transform.position = new Vector3(BoundsController.boundsController.rightBoundary.position.x, transform.position.y, transform.position.z);
         }
 
-        if (transform.position.x < boundsController.leftBoundary.position.x)
+        if (transform.position.x < BoundsController.boundsController.leftBoundary.position.x) //.position.x)
         {
-            transform.position = new Vector3(boundsController.leftBoundary.position.x, transform.position.y, transform.position.z);
+            //transform.position = new Vector3(boundsController.leftBoundary.position.x, transform.position.y, transform.position.z);
+            transform.position = new Vector3(BoundsController.boundsController.leftBoundary.position.x, transform.position.y, transform.position.z);
         }
     }
 
@@ -150,6 +235,26 @@ public class Player2Controller : MonoBehaviour
         playerHorizontalDirection = -playerHorizontalDirection;
 
         playerVerticalDirection = -playerVerticalDirection;
+    }
+
+
+    private void OnTriggerEnter(Collider collidingObject)
+    {
+        if (collidingObject.CompareTag("Ammo"))
+        {
+            Destroy(collidingObject.gameObject);
+
+            TakeDamage(GameController.DAMAGE);
+
+            GameController.gameController.UpdatePlayer1Score();
+        }
+
+        if (collidingObject.CompareTag("Ammo Pickup"))
+        {
+            AddAmmo();
+
+            Destroy(collidingObject.gameObject);
+        }
     }
 
 

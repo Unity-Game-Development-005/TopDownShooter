@@ -2,7 +2,7 @@
 using UnityEngine;
 
 
-public class ProjectileController : MonoBehaviour
+public class AmmoController : MonoBehaviour
 {
     // left and right boundary limits
     private float leftBoundary;
@@ -50,6 +50,17 @@ public class ProjectileController : MonoBehaviour
         if (transform.position.x > rightBoundary)
         {
             Destroy(gameObject);
+        }
+    }
+
+
+    private void OnTriggerEnter(Collider collidingObject)
+    {
+        if (collidingObject.gameObject.CompareTag("Ammo"))
+        {
+            Destroy(gameObject);
+
+            Destroy(collidingObject.gameObject);
         }
     }
 

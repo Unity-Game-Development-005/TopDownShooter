@@ -4,9 +4,6 @@ using UnityEngine;
 
 public class SpawnController : MonoBehaviour
 {
-    // get a reference to the bounds controller script
-    public BoundsController boundsController;
-
     // create an array of health pickup objects
     public GameObject[] healthPickup;
 
@@ -30,10 +27,10 @@ public class SpawnController : MonoBehaviour
     private void SpawnHealthPickup()
     {
         // get a random position along the 'x' axis
-        float randomLocationX = Random.Range(boundsController.leftBoundary.position.x, boundsController.rightBoundary.position.x);
+        float randomLocationX = Random.Range(BoundsController.boundsController.leftBoundary.position.x, BoundsController.boundsController.rightBoundary.position.x);
 
         // get a random position along the 'z' axis
-        float randomLocationZ = Random.Range(boundsController.upperBoundary.position.z, boundsController.lowerBoundary.position.z);
+        float randomLocationZ = Random.Range(BoundsController.boundsController.upperBoundary.position.z, BoundsController.boundsController.lowerBoundary.position.z);
 
         // set the new random position
         Vector3 spawnPosition = new Vector3(randomLocationX, 0.25f, randomLocationZ);
@@ -42,7 +39,7 @@ public class SpawnController : MonoBehaviour
         healthPickupIndex = (Random.Range(0, healthPickup.Length));
 
         // spawn the object
-        Instantiate(healthPickup[healthPickupIndex], spawnPosition , healthPickup[healthPickupIndex].transform.rotation);
+        Instantiate(healthPickup[healthPickupIndex], spawnPosition, Quaternion.Euler(0f, Random.Range(0, 360f), 0f));
     }
 
 

@@ -4,11 +4,17 @@ using UnityEngine;
 
 public class Player1Controller : MonoBehaviour
 {
-    public BoundsController boundsController;
+    public PlayerOneHealth playerOneHealthBar;
+
+    public PlayerOneAmmo playerOneAmmoBar;
+
+    //public BoundsController boundsController;
+
 
     public Transform ammoLauncher;
 
     public GameObject ammoPrefab;
+
 
     [SerializeField] private float playerSpeed;
 
@@ -20,11 +26,22 @@ public class Player1Controller : MonoBehaviour
 
     private Vector3 playerVerticalDirection;
 
+
     private float flip;
 
     public int playerIndex;
 
     private bool facingRight;
+
+
+    public int maximumHealth;
+
+    public int currentHealth;
+
+
+    public int maximumAmmo;
+
+    public int currentAmmo;
 
 
 
@@ -48,12 +65,23 @@ public class Player1Controller : MonoBehaviour
 
         playerVerticalInput = Input.GetAxis("Vertical1");
 
-        if (Input.GetKeyDown(KeyCode.LeftControl))
-        {
-            Instantiate(ammoPrefab, ammoLauncher.position, transform.rotation);
-        }
+        FireAmmo();
 
         MovePlayer();
+    }
+
+
+    private void FireAmmo()
+    {
+        if (currentAmmo > 0)
+        {
+            if (Input.GetKeyDown(KeyCode.LeftControl))
+            {
+                Instantiate(ammoPrefab, ammoLauncher.position, transform.rotation);
+
+                ExpendAmmo();
+            }
+        }
     }
 
 
@@ -68,6 +96,59 @@ public class Player1Controller : MonoBehaviour
         playerVerticalDirection = Vector3.left;
 
         facingRight = true;
+
+
+        // player's maximum health
+        maximumHealth = 10;
+
+        // player's current health
+        currentHealth = maximumHealth;
+
+        // initialise the health bar
+        playerOneHealthBar.SetMaximumHealth(maximumHealth);
+
+        // player's maximum ammo
+        maximumAmmo = 6;
+
+        // player's current ammo
+        currentAmmo = maximumAmmo;
+
+        // initialise the ammo bar
+        playerOneAmmoBar.SetMaximumAmmo(maximumAmmo);
+    }
+
+
+    private void TakeDamage(int damage)
+    {
+        currentHealth -= damage;
+
+        // update the health bar slider
+        playerOneHealthBar.SetHealthValue(currentHealth);
+
+        // if we have no more health
+        if (currentHealth <= 0)
+        {
+            // then the game is over
+            GameController.gameController.GameOver();
+        }
+    }
+
+
+    private void ExpendAmmo()
+    {
+        currentAmmo -= GameController.AMMO;
+
+        // update the ammo bar slider
+        playerOneAmmoBar.SetAmmoValue(currentAmmo);
+    }
+
+
+    private void AddAmmo()
+    {
+        currentAmmo += GameController.AMMO;
+
+        // update the ammo bar slider
+        playerOneAmmoBar.SetAmmoValue(currentAmmo);
     }
 
 
@@ -93,32 +174,32 @@ public class Player1Controller : MonoBehaviour
 
 
         // if the player's 'z' position is greater than the 'z' position of the upper boundary
-        if (transform.position.z > boundsController.upperBoundary.position.z)
+        if (transform.position.z > BoundsController.boundsController.upperBoundary.position.z)
         {
             // then set the player to the upper boundary's 'z' position
-            transform.position = new Vector3(transform.position.x, transform.position.y, boundsController.upperBoundary.position.z);
+            transform.position = new Vector3(transform.position.x, transform.position.y, BoundsController.boundsController.upperBoundary.position.z);
         }
 
         // if the player's 'z' position is less than the 'z' position of the lower boundary
-        if (transform.position.z < boundsController.lowerBoundary.position.z)
+        if (transform.position.z < BoundsController.boundsController.lowerBoundary.position.z)
         {
             // then set the player to the lower boundary's 'z' position
-            transform.position = new Vector3(transform.position.x, transform.position.y, boundsController.lowerBoundary.position.z);
+            transform.position = new Vector3(transform.position.x, transform.position.y, BoundsController.boundsController.lowerBoundary.position.z);
         }
 
 
         // if the player's 'x' position is greater than the 'x' position of the right boundary
-        if (transform.position.x > boundsController.rightBoundary.position.x)
+        if (transform.position.x > BoundsController.boundsController.rightBoundary.position.x)
         {
             // then set the player to the right boundary's 'x' position
-            transform.position = new Vector3(boundsController.rightBoundary.position.x, transform.position.y, transform.position.z);
+            transform.position = new Vector3(BoundsController.boundsController.rightBoundary.position.x, transform.position.y, transform.position.z);
         }
 
         // if the player's 'x' position is less than the 'x' position of the left boundary
-        if (transform.position.x < boundsController.leftBoundary.position.x)
+        if (transform.position.x < BoundsController.boundsController.leftBoundary.position.x)
         {
             // then set the player to the left boundary's 'x' position
-            transform.position = new Vector3(boundsController.leftBoundary.position.x, transform.position.y, transform.position.z);
+            transform.position = new Vector3(BoundsController.boundsController.leftBoundary.position.x, transform.position.y, transform.position.z);
         }
     }
 
@@ -154,6 +235,26 @@ public class Player1Controller : MonoBehaviour
         playerHorizontalDirection = -playerHorizontalDirection;
 
         playerVerticalDirection = -playerVerticalDirection;
+    }
+
+
+    private void OnTriggerEnter(Collider collidingObject)
+    {
+        if (collidingObject.CompareTag("Ammo"))
+        {
+            Destroy(collidingObject.gameObject);
+
+            TakeDamage(GameController.DAMAGE);
+
+            GameController.gameController.UpdatePlayer2Score();
+        }
+
+        if (collidingObject.CompareTag("Ammo Pickup"))
+        {
+            AddAmmo();
+
+            Destroy(collidingObject.gameObject);
+        }
     }
 
 
