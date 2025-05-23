@@ -1,6 +1,6 @@
 
-using UnityEngine;
 using TMPro;
+using UnityEngine;
 using UnityEngine.UI;
 
 
@@ -8,6 +8,7 @@ public class GameController : MonoBehaviour
 {
     // create a single for the game controller
     public static GameController gameController;
+
 
 
     public Image panel;
@@ -28,9 +29,6 @@ public class GameController : MonoBehaviour
 
 
 
-    public bool gameOver;
-
-
     public const int AMMO = 1;
 
     public const int AMMO_PICKUP = 1;
@@ -44,6 +42,9 @@ public class GameController : MonoBehaviour
     public const int MAXIMUM_HEALTH = 10;
 
     public const int IS_DEAD = 0;
+
+
+    public bool gameOver;
 
 
 
@@ -77,21 +78,39 @@ public class GameController : MonoBehaviour
 
     private void WaitForSpaceBar()
     {
-        // if we press the space bar
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (gameOver)
         {
-            // clear the game over elements
-            gameOverText.gameObject.SetActive(false);
+            // check to see if we press the space bar
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                // if we do
+                // clear the game over elements
+                gameOverText.gameObject.SetActive(false);
 
-            startGameText.gameObject.SetActive(false);
+                startGameText.gameObject.SetActive(false);
 
-            panel.gameObject.SetActive(false);
+                panel.gameObject.SetActive(false);
 
-            gameOver = false;
-
-            // and start the game
-            Time.timeScale = 1;
+                RestartGame();
+            }
         }
+    }
+
+
+    private void RestartGame()
+    {
+        // reset player 1
+        Player1Controller.playerOneController.Initialise();
+
+        // reset player 2
+        Player2Controller.playerTwoController.Initialise();
+
+
+        // clear the game over flag
+        gameOver = false;
+
+        // and start the game
+        Time.timeScale = 1;
     }
 
 

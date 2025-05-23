@@ -155,7 +155,7 @@ public class Player2Controller : MonoBehaviour
     }
 
 
-    private void Initialise()
+    public void Initialise()
     {
         flip = 180f;
 
@@ -164,6 +164,10 @@ public class Player2Controller : MonoBehaviour
 
         // moves player along the 'x' axis
         playerVerticalDirection = Vector3.left;
+
+
+        // reset player start position
+        transform.position = new Vector3(10f, 0f, 10f);
 
         facingRight = true;
 
@@ -296,6 +300,11 @@ public class Player2Controller : MonoBehaviour
             AddHealth();
 
             Destroy(collidingObject.gameObject);
+        }
+
+        if (collidingObject.CompareTag("Horse"))
+        {
+            TakeDamage(GameController.MAXIMUM_DAMAGE);
         }
     }
 

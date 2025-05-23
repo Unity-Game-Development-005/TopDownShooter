@@ -12,8 +12,6 @@ public class Player1Controller : MonoBehaviour
 
     public PlayerOneAmmo playerOneAmmoBar;
 
-    //public BoundsController boundsController;
-
 
     public Transform ammoLauncher;
 
@@ -137,6 +135,11 @@ public class Player1Controller : MonoBehaviour
     {
         currentAmmo += GameController.AMMO_PICKUP;
 
+        if (currentAmmo > maximumAmmo)
+        {
+            currentAmmo = maximumAmmo;
+        }
+
         // update the ammo bar slider
         playerOneAmmoBar.SetAmmoValue(currentAmmo);
     }
@@ -144,14 +147,21 @@ public class Player1Controller : MonoBehaviour
 
     private void AddHealth()
     {
+        // add one health point to player's health
         currentHealth += GameController.HEALTH_PICKUP;
+
+        // if player's current health is greater
+        if (currentHealth > maximumHealth)
+        {
+            currentHealth = maximumHealth;
+        }
 
         // update the health bar slider
         playerOneHealthBar.SetHealthValue(currentHealth);
     }
 
 
-    private void Initialise()
+    public void Initialise()
     {
         flip = 180f;
 
@@ -160,6 +170,12 @@ public class Player1Controller : MonoBehaviour
 
         // moves player along the 'x' axis
         playerVerticalDirection = Vector3.left;
+
+
+        // reset player start position and rotation
+        transform.position = new Vector3(-10f, 0f, 10f);
+
+        transform.rotation = Quaternion.Euler(0f, 90f, 0f);
 
         facingRight = true;
 
@@ -172,6 +188,7 @@ public class Player1Controller : MonoBehaviour
 
         // initialise the health bar
         playerOneHealthBar.SetMaximumHealth(maximumHealth);
+
 
         // player's maximum ammo
         maximumAmmo = 6;
@@ -293,6 +310,11 @@ public class Player1Controller : MonoBehaviour
             AddHealth();
 
             Destroy(collidingObject.gameObject);
+        }
+
+        if (collidingObject.CompareTag("Horse"))
+        {
+            TakeDamage(GameController.MAXIMUM_DAMAGE);
         }
     }
 

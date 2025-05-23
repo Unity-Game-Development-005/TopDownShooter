@@ -57,8 +57,6 @@ public class AnimalController : MonoBehaviour
 
     private void OnTriggerEnter(Collider collidingObject)
     {
-        Debug.Log("Hit Horse");
-
         if (collidingObject.CompareTag("Ammo"))
         {
             Destroy(collidingObject.gameObject);
