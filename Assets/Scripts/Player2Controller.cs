@@ -4,6 +4,10 @@ using UnityEngine;
 
 public class Player2Controller : MonoBehaviour
 {
+    // create a singleton for the player 2 controller
+    public static Player2Controller playerTwoController;
+
+
     public PlayerTwoHealth playerTwoHealthBar;
 
     public PlayerTwoAmmo playerTwoAmmoBar;
@@ -42,6 +46,21 @@ public class Player2Controller : MonoBehaviour
     public int maximumAmmo;
 
     public int currentAmmo;
+
+
+
+    private void Awake()
+    {
+        if (playerTwoController == null)
+        {
+            playerTwoController = this;
+        }
+
+        else if (playerTwoController != this)
+        {
+            Destroy(this);
+        }
+    }
 
 
 
@@ -93,6 +112,49 @@ public class Player2Controller : MonoBehaviour
     }
 
 
+    private void TakeDamage(int damage)
+    {
+        currentHealth -= damage;
+
+        // update the health bar slider
+        playerTwoHealthBar.SetHealthValue(currentHealth);
+
+        // if we have no more health
+        if (currentHealth == GameController.IS_DEAD)
+        {
+            // then the game is over
+            GameController.gameController.GameOver();
+        }
+    }
+
+
+    private void ExpendAmmo()
+    {
+        currentAmmo -= GameController.AMMO;
+
+        // update the ammo bar slider
+        playerTwoAmmoBar.SetAmmoValue(currentAmmo);
+    }
+
+
+    private void AddAmmo()
+    {
+        currentAmmo += GameController.AMMO_PICKUP;
+
+        // update the ammo bar slider
+        playerTwoAmmoBar.SetAmmoValue(currentAmmo);
+    }
+
+
+    private void AddHealth()
+    {
+        currentHealth += GameController.HEALTH_PICKUP;
+
+        // update the health bar slider
+        playerTwoHealthBar.SetHealthValue(currentHealth);
+    }
+
+
     private void Initialise()
     {
         flip = 180f;
@@ -107,7 +169,7 @@ public class Player2Controller : MonoBehaviour
 
 
         // player's maximum health
-        maximumHealth = 10;
+        maximumHealth = GameController.MAXIMUM_HEALTH;
 
         // player's current health
         currentHealth = maximumHealth;
@@ -124,33 +186,6 @@ public class Player2Controller : MonoBehaviour
 
         // initialise the ammo bar
         playerTwoAmmoBar.SetMaximumAmmo(maximumAmmo);
-    }
-
-
-    private void TakeDamage(int damage)
-    {
-        currentHealth -= damage;
-
-        // update the health bar slider
-        playerTwoHealthBar.SetHealthValue(currentHealth);
-    }
-
-
-    private void ExpendAmmo()
-    {
-        currentAmmo -= GameController.AMMO;
-
-        // update the ammo bar slider
-        playerTwoAmmoBar.SetAmmoValue(currentAmmo);
-    }
-
-
-    private void AddAmmo()
-    {
-        currentAmmo += GameController.AMMO;
-
-        // update the ammo bar slider
-        playerTwoAmmoBar.SetAmmoValue(currentAmmo);
     }
 
 
@@ -252,6 +287,13 @@ public class Player2Controller : MonoBehaviour
         if (collidingObject.CompareTag("Ammo Pickup"))
         {
             AddAmmo();
+
+            Destroy(collidingObject.gameObject);
+        }
+
+        if (collidingObject.CompareTag("Health Pickup"))
+        {
+            AddHealth();
 
             Destroy(collidingObject.gameObject);
         }

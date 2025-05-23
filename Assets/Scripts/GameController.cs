@@ -31,10 +31,19 @@ public class GameController : MonoBehaviour
     public bool gameOver;
 
 
-
     public const int AMMO = 1;
 
+    public const int AMMO_PICKUP = 1;
+
     public const int DAMAGE = 1;
+
+    public const int MAXIMUM_DAMAGE = 10;
+
+    public const int HEALTH_PICKUP = 1;
+
+    public const int MAXIMUM_HEALTH = 10;
+
+    public const int IS_DEAD = 0;
 
 
 

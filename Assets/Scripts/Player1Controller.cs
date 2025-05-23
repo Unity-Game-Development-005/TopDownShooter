@@ -4,6 +4,10 @@ using UnityEngine;
 
 public class Player1Controller : MonoBehaviour
 {
+    // create a singleto for the player 1 controller
+    public static Player1Controller playerOneController;
+
+
     public PlayerOneHealth playerOneHealthBar;
 
     public PlayerOneAmmo playerOneAmmoBar;
@@ -34,14 +38,29 @@ public class Player1Controller : MonoBehaviour
     private bool facingRight;
 
 
-    public int maximumHealth;
+    [HideInInspector] public int maximumHealth;
 
-    public int currentHealth;
+    [HideInInspector] public int currentHealth;
 
 
-    public int maximumAmmo;
+    [HideInInspector] public int maximumAmmo;
 
-    public int currentAmmo;
+    [HideInInspector] public int currentAmmo;
+
+
+
+    private void Awake()
+    {
+        if (playerOneController == null)
+        {
+            playerOneController = this;
+        }
+
+        else if (playerOneController != this)
+        {
+            Destroy(this);
+        }
+    }
 
 
 
@@ -73,48 +92,19 @@ public class Player1Controller : MonoBehaviour
 
     private void FireAmmo()
     {
+        // if we have ammo
         if (currentAmmo > 0)
         {
+            // and we have pressed the fire button
             if (Input.GetKeyDown(KeyCode.LeftControl))
             {
+                // then shoot
                 Instantiate(ammoPrefab, ammoLauncher.position, transform.rotation);
 
+                // subtract one from ammo
                 ExpendAmmo();
             }
         }
-    }
-
-
-    private void Initialise()
-    {
-        flip = 180f;
-
-        // moves player along the 'z' axis
-        playerHorizontalDirection = Vector3.forward;
-
-        // moves player along the 'x' axis
-        playerVerticalDirection = Vector3.left;
-
-        facingRight = true;
-
-
-        // player's maximum health
-        maximumHealth = 10;
-
-        // player's current health
-        currentHealth = maximumHealth;
-
-        // initialise the health bar
-        playerOneHealthBar.SetMaximumHealth(maximumHealth);
-
-        // player's maximum ammo
-        maximumAmmo = 6;
-
-        // player's current ammo
-        currentAmmo = maximumAmmo;
-
-        // initialise the ammo bar
-        playerOneAmmoBar.SetMaximumAmmo(maximumAmmo);
     }
 
 
@@ -126,7 +116,7 @@ public class Player1Controller : MonoBehaviour
         playerOneHealthBar.SetHealthValue(currentHealth);
 
         // if we have no more health
-        if (currentHealth <= 0)
+        if (currentHealth == GameController.IS_DEAD)
         {
             // then the game is over
             GameController.gameController.GameOver();
@@ -145,10 +135,52 @@ public class Player1Controller : MonoBehaviour
 
     private void AddAmmo()
     {
-        currentAmmo += GameController.AMMO;
+        currentAmmo += GameController.AMMO_PICKUP;
 
         // update the ammo bar slider
         playerOneAmmoBar.SetAmmoValue(currentAmmo);
+    }
+
+
+    private void AddHealth()
+    {
+        currentHealth += GameController.HEALTH_PICKUP;
+
+        // update the health bar slider
+        playerOneHealthBar.SetHealthValue(currentHealth);
+    }
+
+
+    private void Initialise()
+    {
+        flip = 180f;
+
+        // moves player along the 'z' axis
+        playerHorizontalDirection = Vector3.forward;
+
+        // moves player along the 'x' axis
+        playerVerticalDirection = Vector3.left;
+
+        facingRight = true;
+
+
+        // player's maximum health
+        maximumHealth = GameController.MAXIMUM_HEALTH;
+
+        // player's current health
+        currentHealth = maximumHealth;
+
+        // initialise the health bar
+        playerOneHealthBar.SetMaximumHealth(maximumHealth);
+
+        // player's maximum ammo
+        maximumAmmo = 6;
+
+        // player's current ammo
+        currentAmmo = maximumAmmo;
+
+        // initialise the ammo bar
+        playerOneAmmoBar.SetMaximumAmmo(maximumAmmo);
     }
 
 
@@ -252,6 +284,13 @@ public class Player1Controller : MonoBehaviour
         if (collidingObject.CompareTag("Ammo Pickup"))
         {
             AddAmmo();
+
+            Destroy(collidingObject.gameObject);
+        }
+
+        if (collidingObject.CompareTag("Health Pickup"))
+        {
+            AddHealth();
 
             Destroy(collidingObject.gameObject);
         }
