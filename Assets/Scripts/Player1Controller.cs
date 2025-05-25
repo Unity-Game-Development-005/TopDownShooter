@@ -5,7 +5,8 @@ using UnityEngine;
 public class Player1Controller : MonoBehaviour
 {
     // create a singleto for the player 1 controller
-    public static Player1Controller playerOneController;
+    public static Player1Controller player1Controller;
+
 
 
     public PlayerOneHealth playerOneHealthBar;
@@ -31,30 +32,31 @@ public class Player1Controller : MonoBehaviour
 
     private float flip;
 
-    public int playerIndex;
-
     private bool facingRight;
 
 
-    [HideInInspector] public int maximumHealth;
+    //[HideInInspector] public int maximumHealth;
 
     [HideInInspector] public int currentHealth;
 
 
-    [HideInInspector] public int maximumAmmo;
+    //[HideInInspector] public int maximumAmmo;
 
     [HideInInspector] public int currentAmmo;
+
+
+    [HideInInspector] public int player1Score;
 
 
 
     private void Awake()
     {
-        if (playerOneController == null)
+        if (player1Controller == null)
         {
-            playerOneController = this;
+            player1Controller = this;
         }
 
-        else if (playerOneController != this)
+        else if (player1Controller != this)
         {
             Destroy(this);
         }
@@ -114,7 +116,7 @@ public class Player1Controller : MonoBehaviour
         playerOneHealthBar.SetHealthValue(currentHealth);
 
         // if we have no more health
-        if (currentHealth == GameController.IS_DEAD)
+        if (currentHealth <= GameController.IS_DEAD)
         {
             // then the game is over
             GameController.gameController.GameOver();
@@ -135,9 +137,9 @@ public class Player1Controller : MonoBehaviour
     {
         currentAmmo += GameController.AMMO_PICKUP;
 
-        if (currentAmmo > maximumAmmo)
+        if (currentAmmo > GameController.MAXIMUM_AMMO)
         {
-            currentAmmo = maximumAmmo;
+            currentAmmo = GameController.MAXIMUM_AMMO;
         }
 
         // update the ammo bar slider
@@ -151,9 +153,9 @@ public class Player1Controller : MonoBehaviour
         currentHealth += GameController.HEALTH_PICKUP;
 
         // if player's current health is greater
-        if (currentHealth > maximumHealth)
+        if (currentHealth > GameController.MAXIMUM_HEALTH)
         {
-            currentHealth = maximumHealth;
+            currentHealth = GameController.MAXIMUM_HEALTH;
         }
 
         // update the health bar slider
@@ -175,29 +177,31 @@ public class Player1Controller : MonoBehaviour
         // reset player start position and rotation
         transform.position = new Vector3(-10f, 0f, 10f);
 
-        transform.rotation = Quaternion.Euler(0f, 90f, 0f);
-
         facingRight = true;
 
 
+        // player's score
+        player1Score = 0;
+
+
         // player's maximum health
-        maximumHealth = GameController.MAXIMUM_HEALTH;
+        //maximumHealth = GameController.MAXIMUM_HEALTH;
 
         // player's current health
-        currentHealth = maximumHealth;
+        currentHealth = GameController.MAXIMUM_HEALTH;
 
         // initialise the health bar
-        playerOneHealthBar.SetMaximumHealth(maximumHealth);
+        playerOneHealthBar.SetMaximumHealth(GameController.MAXIMUM_HEALTH);
 
 
         // player's maximum ammo
-        maximumAmmo = 6;
+        //maximumAmmo = GameController.MAXIMUM_AMMO;
 
         // player's current ammo
-        currentAmmo = maximumAmmo;
+        currentAmmo = GameController.MAXIMUM_AMMO;
 
         // initialise the ammo bar
-        playerOneAmmoBar.SetMaximumAmmo(maximumAmmo);
+        playerOneAmmoBar.SetMaximumAmmo(GameController.MAXIMUM_AMMO);
     }
 
 

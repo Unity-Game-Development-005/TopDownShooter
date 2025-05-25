@@ -1,11 +1,18 @@
 
+using System.Collections.Generic;
 using UnityEngine;
 
 
 public class SpawnController : MonoBehaviour
 {
+    // create a singleto for the spawn controller
+    public static SpawnController spawnController;
+
     // create an array of health pickup objects
     public GameObject[] healthPickup;
+
+    // array to store objects spawned
+    private List<GameObject> spawnedObjectsList;
 
     // create a health pickup index to allow objects to be randomly spawned
     private int healthPickupIndex;
@@ -19,6 +26,20 @@ public class SpawnController : MonoBehaviour
     // the time interval before next pickup is spawned
     public float spawnInterval;
 
+
+
+    private void Awake()
+    {
+        if (spawnController == null)
+        {
+            spawnController = this;
+        }
+
+        else if (spawnController != this)
+        {
+            Destroy(this);
+        }
+    }
 
 
     private void Start()
@@ -35,6 +56,8 @@ public class SpawnController : MonoBehaviour
 
     private void Initialise()
     {
+        spawnedObjectsList = new  List<GameObject>();
+
         canSpawn = false;
     }
 
@@ -44,10 +67,10 @@ public class SpawnController : MonoBehaviour
         // if the game is running
         if (!GameController.gameController.gameOver)
         {
-            // if we can already spawm a pickup
+            // check if we can spawm a pickup
             if (canSpawn)
             {
-                // then return
+                // if not, then return
                 return;
             }
 
@@ -55,13 +78,13 @@ public class SpawnController : MonoBehaviour
             else
             {
                 // check until player's health or ammo values are less than their maximum values
-                if (Player1Controller.playerOneController.currentHealth < Player1Controller.playerOneController.maximumHealth ||
+                if (Player1Controller.player1Controller.currentHealth < GameController.MAXIMUM_HEALTH ||
 
-                    Player1Controller.playerOneController.currentAmmo < Player1Controller.playerOneController.maximumAmmo     ||
+                    Player1Controller.player1Controller.currentAmmo < GameController.MAXIMUM_AMMO     ||
 
-                    Player2Controller.playerTwoController.currentHealth < Player2Controller.playerTwoController.maximumHealth ||
+                    Player2Controller.player2Controller.currentHealth < GameController.MAXIMUM_HEALTH ||
 
-                    Player2Controller.playerTwoController.currentAmmo < Player2Controller.playerTwoController.maximumAmmo)
+                    Player2Controller.player2Controller.currentAmmo < GameController.MAXIMUM_AMMO)
                 {
                     // then start spawning
                     InvokeRepeating(nameof(SpawnPickup), spawnDelay, spawnInterval);
@@ -89,7 +112,22 @@ public class SpawnController : MonoBehaviour
         healthPickupIndex = (Random.Range(0, healthPickup.Length));
 
         // spawn the object
-        Instantiate(healthPickup[healthPickupIndex], spawnPosition, Quaternion.Euler(0f, Random.Range(0, 360f), 0f));
+        GameObject instantitatedObject = Instantiate(healthPickup[healthPickupIndex], spawnPosition, Quaternion.Euler(0f, Random.Range(0, 360f), 0f));
+
+        // add the object to the spawned objects list
+        spawnedObjectsList.Add(instantitatedObject);
+    }
+
+
+    public void DestroySpawnedObjects()
+    {
+        // destroy all spawned objects on game restart
+        foreach (GameObject spawnedOject in spawnedObjectsList)
+        {
+            Destroy(spawnedOject);
+        }
+
+        Initialise();
     }
 
 

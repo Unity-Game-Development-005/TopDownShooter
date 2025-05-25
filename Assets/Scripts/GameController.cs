@@ -6,45 +6,43 @@ using UnityEngine.UI;
 
 public class GameController : MonoBehaviour
 {
-    // create a single for the game controller
+    // create a singleton for the game controller
     public static GameController gameController;
-
 
 
     public Image panel;
 
-    public TMP_Text playerOneScoreText;
+    public TMP_Text player1ScoreText;
 
-    public TMP_Text playerTwoScoreText;
+    public TMP_Text player2ScoreText;
 
     public TMP_Text gameOverText;
 
     public TMP_Text startGameText;
 
 
-    public int playerOneScore;
-
-    public int playerTwoScore;
-
-
-
 
     public const int AMMO = 1;
 
+
     public const int AMMO_PICKUP = 1;
 
-    public const int DAMAGE = 1;
+    public const int MAXIMUM_AMMO = 6;
 
-    public const int MAXIMUM_DAMAGE = 10;
 
     public const int HEALTH_PICKUP = 1;
 
     public const int MAXIMUM_HEALTH = 10;
 
+
+    public const int DAMAGE = 1;
+
+    public const int MAXIMUM_DAMAGE = 10;
+
     public const int IS_DEAD = 0;
 
 
-    public bool gameOver;
+    [HideInInspector] public bool gameOver;
 
 
 
@@ -64,8 +62,6 @@ public class GameController : MonoBehaviour
 
     private void Start()
     {
-        Initialise();
-
         GameOver();
     }
 
@@ -100,10 +96,15 @@ public class GameController : MonoBehaviour
     private void RestartGame()
     {
         // reset player 1
-        Player1Controller.playerOneController.Initialise();
+        Player1Controller.player1Controller.Initialise();
 
         // reset player 2
-        Player2Controller.playerTwoController.Initialise();
+        Player2Controller.player2Controller.Initialise();
+
+        UpdatePlayerScores();
+
+        // destroy all spawned health pickups
+        SpawnController.spawnController.DestroySpawnedObjects();
 
 
         // clear the game over flag
@@ -111,16 +112,6 @@ public class GameController : MonoBehaviour
 
         // and start the game
         Time.timeScale = 1;
-    }
-
-
-    private void Initialise()
-    {
-        gameOver = true;
-
-        playerOneScore = 0;
-
-        playerTwoScore = 0;
     }
 
 
@@ -143,17 +134,25 @@ public class GameController : MonoBehaviour
 
     public void UpdatePlayer1Score()
     {
-        playerOneScore++;
+        Player1Controller.player1Controller.player1Score++;
 
-        playerOneScoreText.text = playerOneScore.ToString();
+        UpdatePlayerScores();
     }
 
 
     public void UpdatePlayer2Score()
     {
-        playerTwoScore++;
+        Player2Controller.player2Controller.player2Score++;
 
-        playerTwoScoreText.text = playerTwoScore.ToString();
+        UpdatePlayerScores();
+    }
+
+
+    private void UpdatePlayerScores()
+    {
+        player1ScoreText.text = Player1Controller.player1Controller.player1Score.ToString();
+
+        player2ScoreText.text = Player2Controller.player2Controller.player2Score.ToString();
     }
 
 

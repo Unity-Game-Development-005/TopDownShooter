@@ -40,11 +40,13 @@ public class AnimalController : MonoBehaviour
 
 
     private void MoveAnimal()
-    {
+    {      
         transform.Translate(animalSpeed * Time.deltaTime * animalDirection);
 
+        // if the horse reaches a play area boundary 
         if (transform.position.z > BoundsController.boundsController.upperBoundary.position.z)
         {
+            // turn the horse around
             transform.Rotate(0f, flip, 0f);
         }
 
@@ -57,8 +59,16 @@ public class AnimalController : MonoBehaviour
 
     private void OnTriggerEnter(Collider collidingObject)
     {
-        if (collidingObject.CompareTag("Ammo"))
+        // if a player shoots the horse
+        if (collidingObject.CompareTag("Ammo")        ||
+
+            // or the horse eats an ammo pickup
+            collidingObject.CompareTag("Ammo Pickup") ||
+
+            // or the horse eats a health pickup
+            collidingObject.CompareTag("Ammo Pickup"))
         {
+            // simply destroy the object
             Destroy(collidingObject.gameObject);
         }
     }

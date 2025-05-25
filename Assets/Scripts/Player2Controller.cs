@@ -5,7 +5,7 @@ using UnityEngine;
 public class Player2Controller : MonoBehaviour
 {
     // create a singleton for the player 2 controller
-    public static Player2Controller playerTwoController;
+    public static Player2Controller player2Controller;
 
 
     public PlayerTwoHealth playerTwoHealthBar;
@@ -33,30 +33,31 @@ public class Player2Controller : MonoBehaviour
 
     private float flip;
 
-    public int playerIndex;
-
     private bool facingRight;
 
 
-    public int maximumHealth;
+    //[HideInInspector] public int maximumHealth;
 
-    public int currentHealth;
+    [HideInInspector] public int currentHealth;
 
 
-    public int maximumAmmo;
+    //[HideInInspector] public int maximumAmmo;
 
-    public int currentAmmo;
+    [HideInInspector] public int currentAmmo;
+
+
+    [HideInInspector] public int player2Score;
 
 
 
     private void Awake()
     {
-        if (playerTwoController == null)
+        if (player2Controller == null)
         {
-            playerTwoController = this;
+            player2Controller = this;
         }
 
-        else if (playerTwoController != this)
+        else if (player2Controller != this)
         {
             Destroy(this);
         }
@@ -81,9 +82,9 @@ public class Player2Controller : MonoBehaviour
     private void GetPlayerInput()
     {
         // get the player's movement inputs
-        playerVerticalInput = Input.GetAxis("Vertical" + playerIndex);
+        playerVerticalInput = Input.GetAxis("Vertical2");
 
-        playerHorizontalInput = Input.GetAxis("Horizontal" + playerIndex);
+        playerHorizontalInput = Input.GetAxis("Horizontal2");
 
         // see if player is firing
         FireAmmo();
@@ -120,7 +121,7 @@ public class Player2Controller : MonoBehaviour
         playerTwoHealthBar.SetHealthValue(currentHealth);
 
         // if we have no more health
-        if (currentHealth == GameController.IS_DEAD)
+        if (currentHealth <= GameController.IS_DEAD)
         {
             // then the game is over
             GameController.gameController.GameOver();
@@ -141,6 +142,11 @@ public class Player2Controller : MonoBehaviour
     {
         currentAmmo += GameController.AMMO_PICKUP;
 
+        if (currentAmmo > GameController.MAXIMUM_AMMO)
+        {
+            currentAmmo = GameController.MAXIMUM_AMMO;
+        }
+
         // update the ammo bar slider
         playerTwoAmmoBar.SetAmmoValue(currentAmmo);
     }
@@ -149,6 +155,12 @@ public class Player2Controller : MonoBehaviour
     private void AddHealth()
     {
         currentHealth += GameController.HEALTH_PICKUP;
+
+        // if player's current health is greater
+        if (currentHealth > GameController.MAXIMUM_HEALTH)
+        {
+            currentHealth = GameController.MAXIMUM_HEALTH;
+        }
 
         // update the health bar slider
         playerTwoHealthBar.SetHealthValue(currentHealth);
@@ -172,24 +184,28 @@ public class Player2Controller : MonoBehaviour
         facingRight = true;
 
 
+        // player's score
+        player2Score = 0;
+
+
         // player's maximum health
-        maximumHealth = GameController.MAXIMUM_HEALTH;
+        //maximumHealth = GameController.MAXIMUM_HEALTH;
 
         // player's current health
-        currentHealth = maximumHealth;
+        currentHealth = GameController.MAXIMUM_HEALTH;
 
         // initialise the health bar
-        playerTwoHealthBar.SetMaximumHealth(maximumHealth);
+        playerTwoHealthBar.SetMaximumHealth(GameController.MAXIMUM_HEALTH);
 
 
         // player's maximum ammo
-        maximumAmmo = 6;
+        //maximumAmmo = GameController.MAXIMUM_AMMO;
 
         // player's current ammo
-        currentAmmo = maximumAmmo;
+        currentAmmo = GameController.MAXIMUM_AMMO;
 
         // initialise the ammo bar
-        playerTwoAmmoBar.SetMaximumAmmo(maximumAmmo);
+        playerTwoAmmoBar.SetMaximumAmmo(GameController.MAXIMUM_AMMO);
     }
 
 
